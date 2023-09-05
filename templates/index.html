@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Spotify Top Hits Playlist Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+    <h1 class="display-1 text-center">
+        Spotify Top Hits Playlist Generator
+    </h1>
+    <p class="lead text-center">
+        A dumb Python program that creates a spotify playlist filled with your followed artist's
+        top tracks
+    </p>
+    {% if not isCallback %}
+    <p class="lead text-center">Why?</p>
+    <div class="container mx-auto text-center">
+        <figure>
+            <img src="/static/images/drakeApprovesWritingCode.png" class="figure-img img-fluid rounded" width="600"
+                alt="Drake approves writing code">
+        </figure>
+        <div class="container w-50">    
+            <form action="{{ url_for('home') }}" method=POST onsubmit="showLoadingSpinner(event)">
+                <div class="input-group mb-3">
+                    <input name="playlistName" type="text" class="form-control" placeholder="Playlist Name" aria-label="Playlist Name" aria-describedby="button-addon2" required>
+                    <button class="btn btn-outline-primary">
+                        Generate Top Hits Playlist
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+        {% if not userAllowedAuth or not validAccessToken %}
+            <div class="container mx-auto text-center">
+                <figure>
+                    <img src="/static/images/futuramaSuspiciousFry.png" class="figure-img img-fluid rounded" width="600"
+                        alt="Futurama Fry Suspicious of you">
+                </figure>
+                {% if not userAllowedAuth %}
+                    <div class="alert alert-danger" role="alert">
+                        <span class="lead text-center">
+                            You didn't grant dumb Python program access to your Spotify account... sus
+                        </span>
+                    </div>
+                {% elif not validAccessToken %}
+                    <div class="alert alert-danger" role="alert">
+                        <span class="lead text-center">
+                            Dumb Python program couldn't access your Spotfiy account... kinda sus
+                        </span>
+                    </div>
+                {% endif %}
+                <a class="btn btn-outline-primary" href="{{ url_for('home') }}">
+                    Retry
+                </a>
+            </div>
+        {% else %}
+            <div class="container mx-auto text-center">
+               
+                <figure>
+                    {% if numOfArtists > 0 and numOfSongsToAdd > 0 %}
+                    <img src="/static/images/homerSimpsonBackFat.png" class="figure-img img-fluid rounded" width="600"
+                        alt="Home Simpson Back Fat">
+                    {% else %}
+                    <img src="/static/images/surprisedPikachu.jpeg" class="figure-img img-fluid rounded" width="200"
+                        alt="Surprised Pikachu">
+                    {% endif %}
+                </figure>
+                <p class="lead text-center">
+                    Number of Artists you follow: {{numOfArtists}}
+                </p>
+                {% if numOfArtists > 0 and numOfSongsToAdd == 0 %}
+                    <p class="lead text-center">
+                        Can't create the playlist because Dumb Python program couldn't find songs from your artists!
+                        Does your artists even have songs?
+                    </p>
+                {% elif numOfArtists > 0 %}
+                    <p class="lead text-center">
+                        Generated playlist '{{playlistName}}' with {{numOfSongsToAdd}} songs
+                    </p>
+                {% else %}
+                    <p class="lead text-center">
+                        Can't create the playlist if you don't follow artists!
+                    </p>
+                {% endif %}
+                {% if errorsEncountered %}
+                    <p class="lead text-center">
+                        Encountered the following errors when trying to add songs to playlist:
+                    </p>
+                    {% for error in errorsEncountered %}
+                        <p class="lead text-center">
+                            {{error}}
+                        </p>
+                    {% endfor %}
+                {% endif %}
+                <a class="btn btn-outline-primary" href="{{ url_for('home') }}">
+                    Generate Another Playlist
+                </a>
+            </div>
+        {% endif %}
+    {% endif %}
+    <div class="loading-spinner-background loading-spinner--hide">
+        <img class="loading-spinner-img" src="/static/images/cat-what.gif">
+        <br/>
+        <div class="alert alert-secondary" role="alert">
+            <span class="lead text-center">
+                Trying to generate your playlist!
+            </span>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+        crossorigin="anonymous">
+    </script>
+    <script src="/static/js/loadingSpinner.js"></script>
+</body>
+
+</html>
